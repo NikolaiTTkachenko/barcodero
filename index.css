@@ -1,0 +1,39 @@
+:root {
+  --background-color: #d7caca;
+  --background-color-light: #f2efd7;
+  --border-color: #5e5e5e;
+  --text-color: #2e2e2e;
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+* {
+  margin: 10px 10px 10px 10px;
+}
+
+button {
+  padding: 5px 10px 5px 10px;
+  border: solid var(--border-color) 1px;
+  background-color: var(--background-color);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+textarea {
+  border: solid var(--border-color) 1px;
+  background-color: var(--background-color-light);
+  border-radius: 5px;
+}
+
+textarea:focus-visible {
+  outline: none;
+}
+
+.top-label {
+  display: block;
+}
+
+.h2 {
+  font-size: 18px;
+  font-weight: 500;
+}
