@@ -14,7 +14,7 @@ function nextBarcode() {
   if (!source) return;
   else if (cursor < source.length) {
     const nextCursor = Math.min(cursor + strlen, source.length);
-    const extractedStr = source.substring(cursor, nextCursor);
+    const extractedStr = screen(source.substring(cursor, nextCursor));
 
     if (nextCursor === source.length) nextBtn.innerText = "В початок";
     else {
@@ -34,12 +34,17 @@ function nextBarcode() {
       lineColor: "#000",
       width: 2,
       height: 100,
-      displayValue: true // Shows the text below the bars
+      displayValue: true, // Shows the text below the bars
     });
   } else {
     cursor = 0;
     nextBtn.innerText = "Розпочати";
   }
+}
+
+function screen(str) {
+  let result = str.replaceAll("\n", "{CR}");
+  return result;
 }
 
 init();
