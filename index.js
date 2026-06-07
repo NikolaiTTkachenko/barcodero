@@ -1,15 +1,53 @@
 let source = undefined;
-let cursor = 0;
-const strlen = 20;
+let step = 0;
+const codeLength = 20;
 const nextBtn = document.getElementById("nextbarcode");
 
 function init() {
   nextBtn.addEventListener("click", nextBarcode);
 }
 
+function encode(raw, i) {
+  let buff = "";
+  while (raw.codePointAt(i) > 128) {
+    buff += raw.substring(i, i + 1);
+    i++;
+  }
+
+  const bytes = new TextEncoder().encode(buff);
+  const binaryStr = String.fromCodePoint(...bytes);
+  const base64 = btoa(binaryStr);
+
+  return { base64: "[B64:" + base64 + "]", i };
+}
+
+function getSource() {
+  const raw = document.getElementById("text-source").value.trim();
+
+  source = "";
+  let i = 0;
+  while (i < raw.length) {
+    if (raw.codePointAt(i) <= 128) {
+      source += raw.substring(i, i + 1);
+      i++;
+    } else {
+      const enc = encode(raw, i);
+      source += enc.base64;
+      i = enc.i + 1;
+    }
+  }
+}
+
+function cursors(step) {
+  let cursor = Math.min(source.length, (step - 1) * codeLength);
+  let nextCursor = Math.min(source.length, cursor + codeLength);
+  return { cursor, nextCursor };
+}
+
 function nextBarcode() {
-  if (source === undefined)
-    source = document.getElementById("text-source").value.trim();
+  if (source === undefined) {
+    getSource();
+  }
 
   if (!source) return;
   else if (cursor < source.length) {
@@ -23,7 +61,7 @@ function nextBarcode() {
           ? source.length / strlen
           : Math.floor(source.length / strlen) + 1;
       const page = cursor / strlen + 1;
-      nextBtn.innerText = `Показати наступний штрихкод (${page} / ${total})`;
+      nextBtn.innerText = `Наступний &gt;&gt; (${page} / ${total})`;
     }
 
     cursor = nextCursor;
@@ -34,7 +72,7 @@ function nextBarcode() {
       lineColor: "#000",
       width: 2,
       height: 100,
-      displayValue: true, // Shows the text below the bars
+      displayValue: true // Shows the text below the bars
     });
   } else {
     cursor = 0;
