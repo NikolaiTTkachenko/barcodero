@@ -1,10 +1,26 @@
 let source = undefined;
 let step = 0;
 const codeLength = 20;
+let totalSteps = 0;
+const textSource = document.getElementById("text-source"); 
 const nextBtn = document.getElementById("nextbarcode");
+const prevBtn = document.getElementById("prevbarcode");
+const resetBtn = document.getElementById("reset");
+const showStepLbl = document.getElementById("show-step");
 
 function init() {
   nextBtn.addEventListener("click", nextBarcode);
+  prevBtn.addEventListener("click", prevBarcode);
+  prevBtn.disabled = true;
+  resetBtn.addEventListener("click", reset);
+  textSource.addEventListener("change", reset);
+}
+
+function reset(){
+  getSource();
+  step = 0;
+  showStep( 0 ); 
+  getBarcodeImage( undefined ); 
 }
 
 function encode(raw, i) {
@@ -27,7 +43,10 @@ function getSource() {
   source = "";
   let i = 0;
   while (i < raw.length) {
-    if (raw.codePointAt(i) <= 128) {
+    if (raw.codePointAt(i) === 10) {
+      source += "[CR:]";
+      i++;
+    }else if (raw.codePointAt(i) <= 128) {
       source += raw.substring(i, i + 1);
       i++;
     } else {
@@ -36,37 +55,20 @@ function getSource() {
       i = enc.i + 1;
     }
   }
+
+  totalSteps = (source.length % codeLength) === 0 
+    ? source.length / codeLength 
+    : (source.length - source.length % codeLength) / codeLength + 1; 
 }
 
 function cursors(step) {
-  let cursor = Math.min(source.length, (step - 1) * codeLength);
-  let nextCursor = Math.min(source.length, cursor + codeLength);
+  const cursor = Math.min(source.length, (step - 1) * codeLength);
+  const nextCursor = Math.min(source.length, cursor + codeLength);
   return { cursor, nextCursor };
 }
 
-function nextBarcode() {
-  if (source === undefined) {
-    getSource();
-  }
-
-  if (!source) return;
-  else if (cursor < source.length) {
-    const nextCursor = Math.min(cursor + strlen, source.length);
-    const extractedStr = screen(source.substring(cursor, nextCursor));
-
-    if (nextCursor === source.length) nextBtn.innerText = "В початок";
-    else {
-      const total =
-        source.length % strlen === 0
-          ? source.length / strlen
-          : Math.floor(source.length / strlen) + 1;
-      const page = cursor / strlen + 1;
-      nextBtn.innerText = `Наступний &gt;&gt; (${page} / ${total})`;
-    }
-
-    cursor = nextCursor;
-
-    // Generate CODE-128 barcode
+function getBarcodeImage( extractedStr ){
+ // Generate CODE-128 barcode
     JsBarcode("#barcode", extractedStr, {
       format: "CODE128",
       lineColor: "#000",
@@ -74,11 +76,41 @@ function nextBarcode() {
       height: 100,
       displayValue: true // Shows the text below the bars
     });
-  } else {
-    cursor = 0;
-    nextBtn.innerText = "Розпочати";
-  }
 }
+
+function nextBarcode() {
+  if (source === undefined) {
+    getSource();
+  }
+
+  if( step < totalSteps ){
+      const crs = cursors( step + 1 );
+      const extractedStr = source.substring(crs.cursor, crs.nextCursor); 
+      getBarcodeImage( extractedStr ); 
+  }
+  
+  showStep( ++step );
+}
+
+function prevBarcode() {
+  if (source === undefined) {
+    getSource();
+  }
+
+  if( step > 1 ){
+      const crs = cursors( step - 1 );
+      const extractedStr = source.substring(crs.cursor, crs.nextCursor); 
+      getBarcodeImage( extractedStr ); 
+  }
+  
+  showStep( --step );
+}
+
+function showStep( step ){
+   nextBtn.disabled = step >= totalSteps;
+   prevBtn.disabled = step < 2;
+   showStepLbl.innerText = `(${step} / ${totalSteps})`;
+}  
 
 function screen(str) {
   let result = str.replaceAll("\n", "{CR}");
