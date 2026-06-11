@@ -1,0 +1,50 @@
+<html>
+  <body>
+    <label for="ti">Поле зчитування штрихкоду</label>
+    <input type="text" style="display: block; margin: 10px" id="ti" size="50" />
+    <button style="display: block; margin: 10px" id="bd">Декодувати</button>
+    <textarea id="ta" rows="50" cols="50"></textarea>
+  </body>
+  <script>
+    function decode() {
+      const ta = document.getElementById("ta");
+      let v = ta.value.replaceAll("[CR:]", "\r\n");
+
+      let p1 = v.indexOf("[B64:");
+      while (p1 !== -1) {
+        const p2 = v.indexOf("]", p1);
+        let b64b = v.substring(p1, p2 + 1);
+        let b64 = b64b.slice(5, -1);
+
+        const binaryString = atob(b64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const decodedStr = new TextDecoder().decode(bytes);
+
+        console.log(decodedStr);
+
+        v = v.replace(b64b, decodedStr);
+        p1 = v.indexOf("[B64:");
+        //console.log(v);
+        break;
+      }
+
+      ta.value = v;
+    }
+
+    function read() {
+      const ti = document.getElementById("ti");
+      if (!ti.value) return;
+
+      const ta = document.getElementById("ta");
+      ta.value += ti.value;
+      ti.value = "";
+    }
+
+    document.getElementById("bd").addEventListener("click", decode);
+
+    setInterval(read, 1000);
+  </script>
+</html>
