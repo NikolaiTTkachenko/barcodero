@@ -22,13 +22,8 @@
           bytes[i] = binaryString.charCodeAt(i);
         }
         const decodedStr = new TextDecoder().decode(bytes);
-
-        console.log(decodedStr);
-
         v = v.replace(b64b, decodedStr);
         p1 = v.indexOf("[B64:");
-        //console.log(v);
-        break;
       }
 
       ta.value = v;

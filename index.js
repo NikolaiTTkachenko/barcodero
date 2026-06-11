@@ -2,7 +2,7 @@ let source = undefined;
 let step = 0;
 const codeLength = 20;
 let totalSteps = 0;
-const textSource = document.getElementById("text-source"); 
+const textSource = document.getElementById("text-source");
 const nextBtn = document.getElementById("nextbarcode");
 const prevBtn = document.getElementById("prevbarcode");
 const resetBtn = document.getElementById("reset");
@@ -16,11 +16,11 @@ function init() {
   textSource.addEventListener("change", reset);
 }
 
-function reset(){
+function reset() {
   getSource();
   step = 0;
-  showStep( 0 ); 
-  getBarcodeImage( undefined ); 
+  showStep(0);
+  getBarcodeImage(undefined);
 }
 
 function encode(raw, i) {
@@ -34,7 +34,7 @@ function encode(raw, i) {
   const binaryStr = String.fromCodePoint(...bytes);
   const base64 = btoa(binaryStr);
 
-  return { base64: "[B64:" + base64 + "]", i };
+  return { base64: "[B64:" + base64 + "]", i: i - 1 };
 }
 
 function getSource() {
@@ -46,7 +46,7 @@ function getSource() {
     if (raw.codePointAt(i) === 10) {
       source += "[CR:]";
       i++;
-    }else if (raw.codePointAt(i) <= 128) {
+    } else if (raw.codePointAt(i) <= 128) {
       source += raw.substring(i, i + 1);
       i++;
     } else {
@@ -56,9 +56,10 @@ function getSource() {
     }
   }
 
-  totalSteps = (source.length % codeLength) === 0 
-    ? source.length / codeLength 
-    : (source.length - source.length % codeLength) / codeLength + 1; 
+  totalSteps =
+    source.length % codeLength === 0
+      ? source.length / codeLength
+      : (source.length - (source.length % codeLength)) / codeLength + 1;
 }
 
 function cursors(step) {
@@ -67,15 +68,15 @@ function cursors(step) {
   return { cursor, nextCursor };
 }
 
-function getBarcodeImage( extractedStr ){
- // Generate CODE-128 barcode
-    JsBarcode("#barcode", extractedStr, {
-      format: "CODE128",
-      lineColor: "#000",
-      width: 2,
-      height: 100,
-      displayValue: true // Shows the text below the bars
-    });
+function getBarcodeImage(extractedStr) {
+  // Generate CODE-128 barcode
+  JsBarcode("#barcode", extractedStr, {
+    format: "CODE128",
+    lineColor: "#000",
+    width: 2,
+    height: 100,
+    displayValue: true, // Shows the text below the bars
+  });
 }
 
 function nextBarcode() {
@@ -83,13 +84,13 @@ function nextBarcode() {
     getSource();
   }
 
-  if( step < totalSteps ){
-      const crs = cursors( step + 1 );
-      const extractedStr = source.substring(crs.cursor, crs.nextCursor); 
-      getBarcodeImage( extractedStr ); 
+  if (step < totalSteps) {
+    const crs = cursors(step + 1);
+    const extractedStr = source.substring(crs.cursor, crs.nextCursor);
+    getBarcodeImage(extractedStr);
   }
-  
-  showStep( ++step );
+
+  showStep(++step);
 }
 
 function prevBarcode() {
@@ -97,20 +98,20 @@ function prevBarcode() {
     getSource();
   }
 
-  if( step > 1 ){
-      const crs = cursors( step - 1 );
-      const extractedStr = source.substring(crs.cursor, crs.nextCursor); 
-      getBarcodeImage( extractedStr ); 
+  if (step > 1) {
+    const crs = cursors(step - 1);
+    const extractedStr = source.substring(crs.cursor, crs.nextCursor);
+    getBarcodeImage(extractedStr);
   }
-  
-  showStep( --step );
+
+  showStep(--step);
 }
 
-function showStep( step ){
-   nextBtn.disabled = step >= totalSteps;
-   prevBtn.disabled = step < 2;
-   showStepLbl.innerText = `(${step} / ${totalSteps})`;
-}  
+function showStep(step) {
+  nextBtn.disabled = step >= totalSteps;
+  prevBtn.disabled = step < 2;
+  showStepLbl.innerText = `(${step} / ${totalSteps})`;
+}
 
 function screen(str) {
   let result = str.replaceAll("\n", "{CR}");
