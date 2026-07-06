@@ -80,7 +80,9 @@ function getBarcodeImage(extractedStr) {
 }
 
 function getQrcodeImage(extractedStr) {
-  const qrcode = new QRCode(document.getElementById("qrcode"), {
+  const qrCode = document.getElementById("qrcode");
+  qrCode.innerHTML = "";
+  const qrcode = new QRCode(qrCode, {
     text: extractedStr, // The data you want to encode
     width: 256, // Width of the QR code
     height: 256, // Height of the QR code
