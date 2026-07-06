@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barcodero</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <main>
+      <label class="top-label h2" for="text-source"
+        >Уведіть чи скопіюйте текст для конвертації в послідовність
+        штрихкодів</label
+      >
+      <textarea id="text-source" rows="10" cols="100"></textarea>
+      <div>
+        <button id="nextbarcode">Наступний &gt;&gt;</button>
+        <label id="show-step"></label>
+        <button id="prevbarcode">&lt;&lt; Попередній</button>
+        <button id="reset">Скинути</button>
+      </div>
+      <div id="qrcode"></div>
+    </main>
+  </body>
+  <script src="index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</html>

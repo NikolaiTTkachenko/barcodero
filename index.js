@@ -1,6 +1,6 @@
 let source = undefined;
 let step = 0;
-const codeLength = 20;
+const codeLength = 500;
 let totalSteps = 0;
 const textSource = document.getElementById("text-source");
 const nextBtn = document.getElementById("nextbarcode");
@@ -79,6 +79,17 @@ function getBarcodeImage(extractedStr) {
   });
 }
 
+function getQrcodeImage(extractedStr) {
+  const qrcode = new QRCode(document.getElementById("qrcode"), {
+    text: extractedStr, // The data you want to encode
+    width: 256, // Width of the QR code
+    height: 256, // Height of the QR code
+    colorDark: "#000000", // Dark color
+    colorLight: "#ffffff", // Light background color
+    correctLevel: QRCode.CorrectLevel.H, // Error correction level (L, M, Q, H)
+  });
+}
+
 function nextBarcode() {
   if (source === undefined) {
     getSource();
@@ -87,7 +98,7 @@ function nextBarcode() {
   if (step < totalSteps) {
     const crs = cursors(step + 1);
     const extractedStr = source.substring(crs.cursor, crs.nextCursor);
-    getBarcodeImage(extractedStr);
+    getQrcodeImage(extractedStr);
   }
 
   showStep(++step);
@@ -101,7 +112,7 @@ function prevBarcode() {
   if (step > 1) {
     const crs = cursors(step - 1);
     const extractedStr = source.substring(crs.cursor, crs.nextCursor);
-    getBarcodeImage(extractedStr);
+    getQrcodeImage(extractedStr);
   }
 
   showStep(--step);
